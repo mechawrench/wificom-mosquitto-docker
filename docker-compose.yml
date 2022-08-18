@@ -1,0 +1,64 @@
+version: "3.3"
+
+services:
+
+  traefik:
+    image: "traefik:v2.2"
+    container_name: "traefik"
+    restart: "unless-stopped"
+    command:
+      - "--api=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+        
+        # Entrypoints 
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.mqtt.address=:8883"
+#      - "--entrypoints.mqttunsecure.address=:1883"
+        # Redirect http to https
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      
+        # Let's encrypt configuration
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=USER@EMAIL.COM"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8883:8883"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - "traefik.enable=true"
+  mqtt:
+    image: "iegomez/mosquitto-go-auth"
+    container_name: "mosquitto"
+    restart: "unless-stopped"
+    ports:
+      - "1883:1883"
+    expose:
+      - "8883"
+      - "9001"
+      - "1883"
+    volumes:
+      - ./config:/mosquitto/config/
+      - ./config:/etc/mosquitto
+      - /var/run/mysqld:/var/run/mysqld
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.mqtt.rule=Host(`yourwebsite.com`)"
+      - "traefik.http.routers.mqtt.entrypoints=websecure"
+      - "traefik.http.routers.mqtt.tls.certresolver=letsencrypt"
+
+      - "traefik.tcp.routers.mqtt.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.mqtt.tls.certresolver=letsencrypt"
+      - "traefik.tcp.services.mqtt.loadbalancer.server.port=8883"
+      
+      - "traefik.tcp.routers.mqtt.entrypoints=mqtt"
+
+      - "traefik.http.services.mqtt.loadbalancer.server.port=9001"
