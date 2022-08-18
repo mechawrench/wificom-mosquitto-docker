@@ -51,7 +51,7 @@ services:
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.mqtt.rule=Host(`yourwebsite.com`)"
+      - "traefik.http.routers.mqtt.rule=Host(`YOURWEBSITE.COM`)"
       - "traefik.http.routers.mqtt.entrypoints=websecure"
       - "traefik.http.routers.mqtt.tls.certresolver=letsencrypt"
 
