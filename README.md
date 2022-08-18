@@ -15,6 +15,9 @@ This docker-compose file is used to deploy the wificom-mosquitto service.
 ## Instructions
 1. Install docker and docker-compose (out of scope to put tutorial here)
 1. Ensure you've stood up the WiFiCom webapp and have the admin login
+1. Edit docker-compose.yml
+    1. L26 Replace USER@EMAIL.COM with your email
+    1. L54 Replace YOURWEBSITE.COM with your WiFiCom instance hostname
 1. Edit config/conf.d/go-auth.conf, replace the following uppercase values with your own
     - auth_opt_mysql_host IP_ADDRESS_OF_WIFICOM_LARAVEL_APP
     - auth_opt_mysql_port 3306
