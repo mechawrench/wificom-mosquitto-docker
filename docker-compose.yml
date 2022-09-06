@@ -23,7 +23,7 @@ services:
       
         # Let's encrypt configuration
       - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.email=USER@EMAIL.COM"
+      - "--certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}"
       - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
@@ -51,7 +51,7 @@ services:
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.mqtt.rule=Host(`YOURWEBSITE.COM`)"
+      - "traefik.http.routers.mqtt.rule=Host(`${LETSENCRYPT_DOMAIN}`)"
       - "traefik.http.routers.mqtt.entrypoints=websecure"
       - "traefik.http.routers.mqtt.tls.certresolver=letsencrypt"
 
